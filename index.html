@@ -29,7 +29,7 @@
     .mode-btns button.ai-btn { background: #7c3aed; }
     .panel-box {
       background: rgba(15, 23, 42, 0.94); color: #f8fafc; padding: 15px; margin: 15px;
-      border-radius: 10px; max-width: 440px; pointer-events: auto; border-left: 4px solid #fbbf24;
+      border-radius: 10px; max-width: 450px; pointer-events: auto; border-left: 4px solid #fbbf24;
       box-shadow: 0 10px 25px rgba(0,0,0,0.6);
     }
     .panel-box h3 { margin: 0 0 8px; font-size: 15px; color: #fbbf24; }
@@ -69,14 +69,14 @@
 
     <div class="panel-box">
       <span class="badge" id="ai-tag">Skenario Awal • Kearifan Lokal Minangkabau</span>
-      <h3 id="panel-title">Tahap 1: Inspeksi Struktur & K3 Ketinggian</h3>
+      <h3 id="panel-title">Tahap 1: Inspeksi Struktur & Kelengkapan APD Pekerja</h3>
       <p id="panel-desc">
-        Dalam konstruksi tradisional Minangkabau (<i>Bapasak</i>), kekuatan struktur bergantung pada presisi sambungan tanpa paku dan kerja kolektif. Klik objek 3D di layar atau pilih tombol interaksi untuk menguji standar K3!
+        Pekerja di area konstruksi masih memakai topi biasa tanpa perlengkapan K3 lengkap. Klik pekerja manusia 3D atau pilih tombol interaksi untuk memasang <b>helm proyek, sepatu safety, rompi, dan body harness</b>!
       </p>
       <div class="action-grid">
-        <button onclick="interact(1)">1. Cek APD & Body Harness</button>
-        <button onclick="interact(2)">2. Uji Stabilitas Perancah</button>
-        <button onclick="interact(3)">3. Pasang Pasak Pengunci</button>
+        <button onclick="interact(1)">1. Pasang Helm, Sepatu, Rompi & Harness</button>
+        <button onclick="interact(2)">2. Kunci Pagar Perancah</button>
+        <button onclick="interact(3)">3. Pasang Pasak Bapasak</button>
         <button onclick="interact(4)">4. Mitigasi Cuaca / Beban</button>
       </div>
       <div class="status-bar">
@@ -88,42 +88,121 @@
 
   <a-scene vr-mode-ui="enabled: true" renderer="alpha: true; antialias: true">
     <a-sky id="vr-sky" color="#1e293b"></a-sky>
-    <a-grid id="vr-ground"></a-grid>
     <a-plane id="vr-floor" position="0 0 -4" rotation="-90 0 0" width="24" height="24" color="#0f172a"></a-plane>
 
-    <a-light type="ambient" color="#ffffff" intensity="0.8"></a-light>
+    <a-light type="ambient" color="#ffffff" intensity="0.85"></a-light>
     <a-light type="directional" position="2 6 4" intensity="1"></a-light>
 
-    <a-entity id="construction-rig" position="0.4 1.3 -3.5">
-      <!-- 1. Pekerja & APD -->
-      <a-entity id="obj-apd" position="-1.5 0.2 0" onclick="interact(1)">
-        <a-cylinder radius="0.24" height="0.95" color="#f97316"></a-cylinder>
-        <a-sphere position="0 0.68 0" radius="0.22" color="#fbbf24"></a-sphere>
-        <a-text value="[1] APD Pekerja" position="-0.6 1.15 0" color="#ffffff" width="3.5"></a-text>
+    <a-entity id="construction-rig" position="0.45 1.15 -3.5">
+      
+      <!-- 1. FIGUR MANUSIA PEKERJA 3D LENGKAP -->
+      <a-entity id="obj-apd" position="-1.55 0 0" onclick="interact(1)">
+        
+        <!-- Celana Kerja (Kaki Kiri & Kanan) -->
+        <a-cylinder position="-0.11 -0.25 0" radius="0.068" height="0.54" color="#1e3a8a"></a-cylinder>
+        <a-cylinder position="0.11 -0.25 0" radius="0.068" height="0.54" color="#1e3a8a"></a-cylinder>
+
+        <!-- Sepatu Biasa (Awal) -->
+        <a-entity id="casual-shoes" visible="true">
+          <a-box position="-0.11 -0.53 0.03" width="0.12" height="0.06" depth="0.2" color="#9ca3af"></a-box>
+          <a-box position="0.11 -0.53 0.03" width="0.12" height="0.06" depth="0.2" color="#9ca3af"></a-box>
+        </a-entity>
+
+        <!-- SEPATU SAFETY (Muncul saat APD diklik: Boots Hitam + Sol Kuning + Pelindung Ujung Baja) -->
+        <a-entity id="safety-shoes" visible="false">
+          <a-box position="-0.11 -0.51 0.04" width="0.14" height="0.11" depth="0.24" color="#111827"></a-box>
+          <a-box position="0.11 -0.51 0.04" width="0.14" height="0.11" depth="0.24" color="#111827"></a-box>
+          <!-- Sol Tebal Kuning -->
+          <a-box position="-0.11 -0.56 0.04" width="0.145" height="0.025" depth="0.245" color="#facc15"></a-box>
+          <a-box position="0.11 -0.56 0.04" width="0.145" height="0.025" depth="0.245" color="#facc15"></a-box>
+          <!-- Steel Toe Cap -->
+          <a-sphere position="-0.11 -0.50 0.14" radius="0.065" color="#374151"></a-sphere>
+          <a-sphere position="0.11 -0.50 0.14" radius="0.065" color="#374151"></a-sphere>
+        </a-entity>
+
+        <!-- Baju Kaus Kerja Dasar -->
+        <a-box position="0 0.25 0" width="0.36" height="0.52" depth="0.20" color="#3b82f6"></a-box>
+
+        <!-- ROMPI KESELAMATAN PROYEK (Muncul saat APD diklik) -->
+        <a-entity id="safety-vest" visible="false">
+          <a-box position="0 0.26 0" width="0.39" height="0.50" depth="0.225" color="#f97316"></a-box>
+          <!-- Strip Reflektif Kuning -->
+          <a-box position="0 0.34 0.115" width="0.395" height="0.045" depth="0.01" color="#fde047"></a-box>
+          <a-box position="0 0.16 0.115" width="0.395" height="0.045" depth="0.01" color="#fde047"></a-box>
+        </a-entity>
+
+        <!-- FULL BODY HARNESS & CARABINER (Muncul saat APD diklik) -->
+        <a-entity id="body-harness" visible="false">
+          <!-- Tali Bahu Kiri & Kanan -->
+          <a-box position="-0.11 0.26 0.12" width="0.04" height="0.51" depth="0.015" color="#0f172a"></a-box>
+          <a-box position="0.11 0.26 0.12" width="0.04" height="0.51" depth="0.015" color="#0f172a"></a-box>
+          <!-- Sabuk Pinggang -->
+          <a-box position="0 0.04 0" width="0.41" height="0.05" depth="0.24" color="#0f172a"></a-box>
+          <!-- Tali Paha -->
+          <a-cylinder position="-0.11 -0.08 0" radius="0.075" height="0.04" color="#0f172a"></a-cylinder>
+          <a-cylinder position="0.11 -0.08 0" radius="0.075" height="0.04" color="#0f172a"></a-cylinder>
+          <!-- Cincin Carabiner Pengait Dada -->
+          <a-torus position="0 0.28 0.13" radius="0.035" radius-tubular="0.008" color="#e2e8f0"></a-torus>
+        </a-entity>
+
+        <!-- Lengan Kiri & Kanan Manusia -->
+        <a-entity id="left-arm-pivot" position="-0.24 0.46 0">
+          <a-cylinder position="0 -0.07 0" radius="0.055" height="0.14" color="#3b82f6"></a-cylinder>
+          <a-cylinder position="0 -0.25 0" radius="0.048" height="0.28" color="#fdba74"></a-cylinder>
+        </a-entity>
+        <a-entity id="right-arm-pivot" position="0.24 0.46 0">
+          <a-cylinder position="0 -0.07 0" radius="0.055" height="0.14" color="#3b82f6"></a-cylinder>
+          <a-cylinder position="0 -0.25 0" radius="0.048" height="0.28" color="#fdba74"></a-cylinder>
+        </a-entity>
+
+        <!-- Leher & Kepala Manusia -->
+        <a-cylinder position="0 0.55 0" radius="0.06" height="0.1" color="#fdba74"></a-cylinder>
+        <a-sphere position="0 0.72 0" radius="0.16" color="#fdba74"></a-sphere>
+        <!-- Mata & Mulut -->
+        <a-sphere position="-0.055 0.74 0.14" radius="0.02" color="#0f172a"></a-sphere>
+        <a-sphere position="0.055 0.74 0.14" radius="0.02" color="#0f172a"></a-sphere>
+        <a-box position="0 0.67 0.15" width="0.06" height="0.015" depth="0.01" color="#9a3412"></a-box>
+
+        <!-- TOPI BIASA / CASUAL CAP (Dipakai saat awal sebelum klik) -->
+        <a-entity id="casual-cap" position="0 0.80 0" visible="true">
+          <a-sphere radius="0.162" theta-length="85" color="#475569"></a-sphere>
+          <a-box position="0 0.01 0.16" width="0.18" height="0.015" depth="0.14" color="#334155"></a-box>
+        </a-entity>
+
+        <!-- HELM PROYEK / SAFETY HELMET (Turun menggantikan topi biasa saat diklik) -->
+        <a-entity id="safety-helmet" position="0 1.45 0" visible="false">
+          <a-sphere radius="0.18" theta-length="90" color="#facc15"></a-sphere>
+          <a-cylinder position="0 0.01 0.03" radius="0.22" height="0.022" color="#eab308"></a-cylinder>
+          <a-box position="0 0.09 0" width="0.04" height="0.18" depth="0.35" color="#fde047"></a-box>
+        </a-entity>
+
+        <a-text value="[1] Pekerja & APD" position="-0.6 1.18 0" color="#ffffff" width="3.5"></a-text>
       </a-entity>
 
-      <!-- 2. Perancah (Scaffolding) -->
+      <!-- 2. PERANCAH KERJA (SCAFFOLDING) BERGERAK -->
       <a-entity id="obj-scaffold" position="0 0 0" onclick="interact(2)">
-        <a-box position="0 -0.15 0" width="1.5" height="0.1" depth="0.9" color="#94a3b8"></a-box>
-        <a-cylinder position="-0.65 0.35 -0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
-        <a-cylinder position="0.65 0.35 -0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
-        <a-cylinder position="-0.65 0.35 0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
-        <a-cylinder position="0.65 0.35 0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
-        <a-text value="[2] Perancah Kerja" position="-0.65 1.15 0" color="#ffffff" width="3.5"></a-text>
+        <a-box id="scaffold-deck" position="0 -0.05 0" width="1.5" height="0.1" depth="0.9" color="#94a3b8"></a-box>
+        <a-cylinder position="-0.65 0.45 -0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
+        <a-cylinder position="0.65 0.45 -0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
+        <a-cylinder position="-0.65 0.45 0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
+        <a-cylinder position="0.65 0.45 0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
+        <a-box id="scaffold-guardrail" position="0 1.45 0.35" width="1.35" height="0.05" depth="0.05" color="#f59e0b"></a-box>
+        <a-text value="[2] Perancah Kerja" position="-0.65 1.25 0" color="#ffffff" width="3.5"></a-text>
       </a-entity>
 
-      <!-- 3. Sambungan Kayu Bapasak -->
-      <a-entity id="obj-pasak" position="1.5 0.25 0" onclick="interact(3)">
+      <!-- 3. SAMBUNGAN KAYU BAPASAK BERGERAK -->
+      <a-entity id="obj-pasak" position="1.55 0.35 0" onclick="interact(3)">
         <a-box width="0.9" height="0.28" depth="0.28" color="#92400e"></a-box>
-        <a-cylinder id="pasak-pin" position="0 0.28 0" radius="0.07" height="0.5" color="#ef4444"></a-cylinder>
+        <a-cylinder id="pasak-pin" position="0 0.32 0" radius="0.07" height="0.52" color="#ef4444"></a-cylinder>
         <a-text value="[3] Sambungan Bapasak" position="-0.85 0.85 0" color="#fbbf24" width="3.5"></a-text>
       </a-entity>
 
-      <!-- 4. Sensor Risiko -->
-      <a-entity id="obj-hazard" position="0 1.45 -0.4" onclick="interact(4)">
-        <a-octahedron id="hazard-beacon" radius="0.25" color="#ef4444" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-octahedron>
-        <a-text value="[4] Sensor Risiko" position="-0.55 0.4 0" color="#f87171" width="3.5"></a-text>
+      <!-- 4. SENSOR RISIKO BERGERAK -->
+      <a-entity id="obj-hazard" position="0 1.55 -0.4" onclick="interact(4)">
+        <a-octahedron id="hazard-beacon" radius="0.24" color="#ef4444" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-octahedron>
+        <a-text value="[4] Sensor Risiko" position="-0.55 0.38 0" color="#f87171" width="3.5"></a-text>
       </a-entity>
+
     </a-entity>
 
     <a-camera position="0 1.6 0">
@@ -139,19 +218,19 @@
       {
         tag: "GenAI Skenario #1 • Angin Kencang Lembah Anai",
         title: "Variasi Kasus: Konstruksi Atap Gonjong di Ketinggian 12m",
-        desc: "GenAI mendeteksi kecepatan angin 35 knot dan kelembapan tinggi. Evaluasi kembali titik tumpu perancah dan pengunci pasak kayu sebelum pengangkatan kuda-kuda atap!",
+        desc: "GenAI mendeteksi kecepatan angin 35 knot. Ganti topi pekerja dengan helm proyek, pasang sepatu safety, rompi & body harness, serta kunci perancah!",
         skyColor: "#0f172a", beaconColor: "#ef4444", pasakColor: "#ef4444"
       },
       {
         tag: "GenAI Skenario #2 • Area Rawan Gempa Pesisir",
         title: "Variasi Kasus: Simulasi Beban Lateral pada Struktur Bapasak",
-        desc: "GenAI memodifikasi parameter getaran tanah. Nilai filosofi 'Alam Takambang Jadi Guru' menuntut struktur lentur namun terkunci. Verifikasi kelonggaran pasak & jalur evakuasi!",
+        desc: "GenAI memodifikasi parameter getaran tanah. Filosofi 'Alam Takambang Jadi Guru' menuntut struktur lentur terkunci dan APD pekerja lengkap.",
         skyColor: "#31102f", beaconColor: "#f59e0b", pasakColor: "#f59e0b"
       },
       {
         tag: "GenAI Skenario #3 • Pekerjaan Malam & Pencahayaan Minim",
-        title: "Variasi Kasus: Pengecoran & Perakitan Balok Utama Shift Malam",
-        desc: "GenAI menurunkan visibilitas lingkungan 3D. Pastikan rompi reflektif (APD), pengaman tepi perancah, dan komunikasi isyarat antarpekerja aktif.",
+        title: "Variasi Kasus: Perakitan Balok Utama Shift Malam",
+        desc: "GenAI menurunkan visibilitas area kerja. Pastikan helm proyek, sepatu safety, rompi reflektif oranye, dan body harness pekerja terpasang!",
         skyColor: "#020617", beaconColor: "#38bdf8", pasakColor: "#ef4444"
       }
     ];
@@ -182,22 +261,49 @@
       const desc = document.getElementById('panel-desc');
 
       if (step === 1) {
-        document.querySelector('#obj-apd a-cylinder').setAttribute('color', '#22c55e');
-        title.innerText = "Titik Interaksi 1: Verifikasi APD & Full Body Harness (LOLOS)";
-        desc.innerText = "Analisis K3: Pekerja telah dilengkapi helm standar SNI, rompi reflektif, dan double-lanyard body harness yang tertambat pada lifeline independen.";
+        // Lepas topi biasa & ganti dengan Helm Proyek yang turun memantul
+        document.getElementById('casual-cap').setAttribute('visible', 'false');
+        const helmet = document.getElementById('safety-helmet');
+        helmet.setAttribute('visible', 'true');
+        helmet.setAttribute('animation', 'property: position; from: 0 1.45 0; to: 0 0.78 0; dur: 650; easing: easeOutBounce');
+        
+        // Ganti sepatu biasa ke Sepatu Safety
+        document.getElementById('casual-shoes').setAttribute('visible', 'false');
+        document.getElementById('safety-shoes').setAttribute('visible', 'true');
+
+        // Pasang Rompi Reflektif & Full Body Harness
+        document.getElementById('safety-vest').setAttribute('visible', 'true');
+        document.getElementById('body-harness').setAttribute('visible', 'true');
+        
+        // Gerakan lengan pekerja terangkat memberi tanda siap kerja
+        document.getElementById('right-arm-pivot').setAttribute('animation', 'property: rotation; to: 0 0 135; dur: 500; easing: easeOutQuad');
+        document.getElementById('left-arm-pivot').setAttribute('animation', 'property: rotation; to: 0 0 -25; dur: 500');
+
+        title.innerText = "Titik Interaksi 1: Helm, Sepatu Safety, Rompi & Harness Terpasang (LOLOS)";
+        desc.innerText = "Analisis K3: Topi biasa telah diganti Helm Proyek SNI, lengkap dengan Sepatu Safety berujung baja, Rompi Reflektif, dan Full Body Harness.";
       } else if (step === 2) {
-        document.querySelector('#obj-scaffold a-box').setAttribute('color', '#22c55e');
-        title.innerText = "Titik Interaksi 2: Uji Beban & Pengunci Perancah (LOLOS)";
-        desc.innerText = "Analisis K3: Base plate terpasang rata, cross-brace terkunci, dan guardrail terpasang di ketinggian 1,1 meter sesuai Permenaker No. 1/1980.";
+        document.getElementById('scaffold-deck').setAttribute('color', '#22c55e');
+        const rail = document.getElementById('scaffold-guardrail');
+        rail.setAttribute('color', '#22c55e');
+        rail.setAttribute('animation', 'property: position; from: 0 1.45 0.35; to: 0 0.75 0.35; dur: 600; easing: easeOutQuad');
+
+        title.innerText = "Titik Interaksi 2: Pagar Pengaman Perancah Terkunci (LOLOS)";
+        desc.innerText = "Analisis K3: Guardrail perancah turun mengunci pada ketinggian 1,1 meter dan pelat dasar tervalidasi aman sesuai Permenaker No. 1/1980.";
       } else if (step === 3) {
-        document.getElementById('pasak-pin').setAttribute('position', '0 0.05 0');
-        document.getElementById('pasak-pin').setAttribute('color', '#22c55e');
-        title.innerText = "Titik Interaksi 3: Penguncian Pasak Kayu Tradisional (LOLOS)";
-        desc.innerText = "Kearifan Lokal Bapasak: Pasak kayu masuk presisi ke lubang purus, meredam gaya geser tanpa paku sekaligus mencegah risiko serpihan logam tajam di area kerja.";
+        const pin = document.getElementById('pasak-pin');
+        pin.setAttribute('color', '#22c55e');
+        pin.setAttribute('animation', 'property: position; from: 0 0.32 0; to: 0 0.04 0; dur: 600; easing: easeOutQuad');
+        document.getElementById('obj-pasak').setAttribute('animation', 'property: rotation; from: 0 0 0; to: 0 360 0; dur: 1200; easing: easeInOutQuad');
+
+        title.innerText = "Titik Interaksi 3: Penguncian Pasak Kayu Bapasak (LOLOS)";
+        desc.innerText = "Kearifan Lokal Bapasak: Pasak kayu bergerak masuk presisi mengunci balok purus tanpa paku logam, meredam gaya geser & mencegah luka gores.";
       } else if (step === 4) {
-        document.getElementById('hazard-beacon').setAttribute('color', '#22c55e');
+        const beacon = document.getElementById('hazard-beacon');
+        beacon.setAttribute('color', '#22c55e');
+        document.getElementById('obj-hazard').setAttribute('animation', 'property: position; to: 0 1.85 -0.4; dur: 600; easing: easeOutQuad');
+
         title.innerText = "Titik Interaksi 4: Mitigasi Risiko & JSA Selesai (AMAN)";
-        desc.innerText = "Analisis GenAI: Job Safety Analysis (JSA) tervalidasi. Seluruh parameter lingkungan dan struktur berada pada ambang batas aman untuk melanjutkan pekerjaan.";
+        desc.innerText = "Analisis GenAI: Job Safety Analysis (JSA) tervalidasi. Seluruh parameter lingkungan dan struktur berada pada ambang batas aman.";
       }
 
       const count = completedSteps.size;
@@ -209,17 +315,48 @@
       completedSteps.clear();
       document.getElementById('progress-text').innerText = `Titik Interaksi Selesai: 0/4`;
       document.getElementById('safety-score').innerText = `Skor K3: 0%`;
+      
       const sc = aiScenarios[currentScenarioIndex];
       currentScenarioIndex = (currentScenarioIndex + 1) % aiScenarios.length;
+      
       document.getElementById('ai-tag').innerText = sc.tag;
       document.getElementById('panel-title').innerText = sc.title;
       document.getElementById('panel-desc').innerText = sc.desc;
       document.getElementById('vr-sky').setAttribute('color', sc.skyColor);
+      
+      // Reset pekerja kembali memakai topi biasa tanpa APD lengkap
+      document.getElementById('casual-cap').setAttribute('visible', 'true');
+      const helmet = document.getElementById('safety-helmet');
+      helmet.removeAttribute('animation');
+      helmet.setAttribute('position', '0 1.45 0');
+      helmet.setAttribute('visible', 'false');
+
+      document.getElementById('casual-shoes').setAttribute('visible', 'true');
+      document.getElementById('safety-shoes').setAttribute('visible', 'false');
+      document.getElementById('safety-vest').setAttribute('visible', 'false');
+      document.getElementById('body-harness').setAttribute('visible', 'false');
+
+      document.getElementById('right-arm-pivot').removeAttribute('animation');
+      document.getElementById('right-arm-pivot').setAttribute('rotation', '0 0 0');
+      document.getElementById('left-arm-pivot').removeAttribute('animation');
+      document.getElementById('left-arm-pivot').setAttribute('rotation', '0 0 0');
+
+      const rail = document.getElementById('scaffold-guardrail');
+      rail.removeAttribute('animation');
+      rail.setAttribute('position', '0 1.45 0.35');
+      rail.setAttribute('color', '#f59e0b');
+      document.getElementById('scaffold-deck').setAttribute('color', '#94a3b8');
+
+      const pin = document.getElementById('pasak-pin');
+      pin.removeAttribute('animation');
+      pin.setAttribute('position', '0 0.32 0');
+      pin.setAttribute('color', sc.pasakColor);
+      document.getElementById('obj-pasak').removeAttribute('animation');
+      document.getElementById('obj-pasak').setAttribute('rotation', '0 0 0');
+
       document.getElementById('hazard-beacon').setAttribute('color', sc.beaconColor);
-      document.getElementById('pasak-pin').setAttribute('position', '0 0.28 0');
-      document.getElementById('pasak-pin').setAttribute('color', sc.pasakColor);
-      document.querySelector('#obj-apd a-cylinder').setAttribute('color', '#f97316');
-      document.querySelector('#obj-scaffold a-box').setAttribute('color', '#94a3b8');
+      document.getElementById('obj-hazard').removeAttribute('animation');
+      document.getElementById('obj-hazard').setAttribute('position', '0 1.55 -0.4');
     }
   </script>
 </body>
