@@ -6,28 +6,31 @@
   <title>K3 Konstruksi AR/VR - Kearifan Lokal Bapasak</title>
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <style>
-    body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+    * { box-sizing: border-box; }
+    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #0f172a; }
+    a-scene { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; }
+    #video-bg { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 0; display: none; }
     #hud {
-      position: fixed; top: 0; left: 0; width: 100%; z-index: 999;
-      pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; height: 100vh;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
+      pointer-events: none; display: flex; flex-direction: column; justify-content: space-between;
     }
     .top-bar {
-      background: rgba(15, 23, 42, 0.9); color: #fff; padding: 12px 18px;
-      display: flex; justify-content: space-between; align-items: center; pointer-events: auto;
-      border-bottom: 3px solid #f59e0b;
+      background: rgba(15, 23, 42, 0.92); color: #fff; padding: 12px 18px;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+      pointer-events: auto; border-bottom: 3px solid #f59e0b; gap: 8px;
     }
     .title-group h1 { margin: 0; font-size: 16px; color: #fbbf24; }
     .title-group p { margin: 2px 0 0; font-size: 12px; color: #cbd5e1; }
     .mode-btns button {
-      background: #2563eb; color: white; border: none; padding: 8px 12px; margin-left: 6px;
+      background: #2563eb; color: white; border: none; padding: 8px 12px; margin-left: 4px;
       border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px;
     }
     .mode-btns button.ar-btn { background: #059669; }
     .mode-btns button.ai-btn { background: #7c3aed; }
     .panel-box {
-      background: rgba(15, 23, 42, 0.92); color: #f8fafc; padding: 15px; margin: 15px;
+      background: rgba(15, 23, 42, 0.94); color: #f8fafc; padding: 15px; margin: 15px;
       border-radius: 10px; max-width: 440px; pointer-events: auto; border-left: 4px solid #fbbf24;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6);
     }
     .panel-box h3 { margin: 0 0 8px; font-size: 15px; color: #fbbf24; }
     .panel-box p { margin: 0 0 10px; font-size: 13px; line-height: 1.4; }
@@ -39,24 +42,18 @@
     .action-grid button:hover { background: #f59e0b; color: #000; font-weight: bold; }
     .badge {
       display: inline-block; background: #7c3aed; color: #fff; font-size: 10px;
-      padding: 2px 6px; border-radius: 4px; margin-bottom: 5px; text-transform: uppercase;
-    }
-    #video-bg {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      object-fit: cover; z-index: -1; display: none;
+      padding: 3px 7px; border-radius: 4px; margin-bottom: 6px; text-transform: uppercase;
     }
     .status-bar {
       margin-top: 10px; padding-top: 8px; border-top: 1px solid #334155;
-      font-size: 12px; color: #38bdf8; display: flex; justify-content: space-between;
+      font-size: 12px; color: #38bdf8; display: flex; justify-content: space-between; font-weight: bold;
     }
   </style>
 </head>
 <body>
 
-  <!-- Kamera untuk Mode AR -->
   <video id="video-bg" autoplay playsinline></video>
 
-  <!-- Antarmuka Pengguna (HUD) -->
   <div id="hud">
     <div class="top-bar">
       <div class="title-group">
@@ -70,11 +67,11 @@
       </div>
     </div>
 
-    <div class="panel-box" id="interaction-panel">
+    <div class="panel-box">
       <span class="badge" id="ai-tag">Skenario Awal • Kearifan Lokal Minangkabau</span>
       <h3 id="panel-title">Tahap 1: Inspeksi Struktur & K3 Ketinggian</h3>
       <p id="panel-desc">
-        Dalam konstruksi tradisional Minangkabau (<i>Bapasak</i>), kekuatan struktur bergantung pada presisi sambungan tanpa paku dan kerja kolektif. Klik objek 3D di layar atau pilih titik interaksi di bawah untuk menguji standar K3!
+        Dalam konstruksi tradisional Minangkabau (<i>Bapasak</i>), kekuatan struktur bergantung pada presisi sambungan tanpa paku dan kerja kolektif. Klik objek 3D di layar atau pilih tombol interaksi untuk menguji standar K3!
       </p>
       <div class="action-grid">
         <button onclick="interact(1)">1. Cek APD & Body Harness</button>
@@ -89,52 +86,46 @@
     </div>
   </div>
 
-  <!-- Lingkungan 3D WebXR (VR & AR) -->
-  <a-scene embedded vr-mode-ui="enabled: true" renderer="alpha: true">
-    <!-- Langit VR (Disembunyikan saat Mode AR) -->
+  <a-scene vr-mode-ui="enabled: true" renderer="alpha: true; antialias: true">
     <a-sky id="vr-sky" color="#1e293b"></a-sky>
-    <a-plane id="vr-ground" position="0 0 -4" rotation="-90 0 0" width="20" height="20" color="#334155"></a-plane>
+    <a-grid id="vr-ground"></a-grid>
+    <a-plane id="vr-floor" position="0 0 -4" rotation="-90 0 0" width="24" height="24" color="#0f172a"></a-plane>
 
-    <!-- Pencahayaan -->
-    <a-light type="ambient" color="#ffffff" intensity="0.7"></a-light>
-    <a-light type="directional" position="2 5 3" intensity="0.9"></a-light>
+    <a-light type="ambient" color="#ffffff" intensity="0.8"></a-light>
+    <a-light type="directional" position="2 6 4" intensity="1"></a-light>
 
-    <!-- Grup Objek Konstruksi K3 & Struktur Bapasak -->
-    <a-entity id="construction-rig" position="0 1.2 -3.5">
-      
-      <!-- Titik Interaksi 1: Pekerja & APD (Helm & Harness) -->
-      <a-entity id="obj-apd" position="-1.5 0.3 0" class="clickable" onclick="interact(1)">
-        <a-cylinder radius="0.22" height="0.9" color="#f97316"></a-cylinder>
-        <a-sphere position="0 0.65 0" radius="0.2" color="#fbbf24"></a-sphere>
-        <a-text value="[1] APD Pekerja" position="-0.5 1.05 0" color="#fff" width="3"></a-text>
+    <a-entity id="construction-rig" position="0.4 1.3 -3.5">
+      <!-- 1. Pekerja & APD -->
+      <a-entity id="obj-apd" position="-1.5 0.2 0" onclick="interact(1)">
+        <a-cylinder radius="0.24" height="0.95" color="#f97316"></a-cylinder>
+        <a-sphere position="0 0.68 0" radius="0.22" color="#fbbf24"></a-sphere>
+        <a-text value="[1] APD Pekerja" position="-0.6 1.15 0" color="#ffffff" width="3.5"></a-text>
       </a-entity>
 
-      <!-- Titik Interaksi 2: Struktur Perancah (Scaffolding) -->
-      <a-entity id="obj-scaffold" position="0 0 0" class="clickable" onclick="interact(2)">
-        <a-box position="0 -0.2 0" width="1.4" height="0.08" depth="0.8" color="#94a3b8"></a-box>
-        <a-cylinder position="-0.6 0.3 -0.3" radius="0.04" height="1.2" color="#cbd5e1"></a-cylinder>
-        <a-cylinder position="0.6 0.3 -0.3" radius="0.04" height="1.2" color="#cbd5e1"></a-cylinder>
-        <a-cylinder position="-0.6 0.3 0.3" radius="0.04" height="1.2" color="#cbd5e1"></a-cylinder>
-        <a-cylinder position="0.6 0.3 0.3" radius="0.04" height="1.2" color="#cbd5e1"></a-cylinder>
-        <a-text value="[2] Perancah Kerja" position="-0.55 1.1 0" color="#fff" width="3"></a-text>
+      <!-- 2. Perancah (Scaffolding) -->
+      <a-entity id="obj-scaffold" position="0 0 0" onclick="interact(2)">
+        <a-box position="0 -0.15 0" width="1.5" height="0.1" depth="0.9" color="#94a3b8"></a-box>
+        <a-cylinder position="-0.65 0.35 -0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
+        <a-cylinder position="0.65 0.35 -0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
+        <a-cylinder position="-0.65 0.35 0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
+        <a-cylinder position="0.65 0.35 0.35" radius="0.04" height="1.2" color="#e2e8f0"></a-cylinder>
+        <a-text value="[2] Perancah Kerja" position="-0.65 1.15 0" color="#ffffff" width="3.5"></a-text>
       </a-entity>
 
-      <!-- Titik Interaksi 3: Sambungan Kayu Bapasak (Kearifan Lokal) -->
-      <a-entity id="obj-pasak" position="1.5 0.3 0" class="clickable" onclick="interact(3)">
-        <a-box width="0.8" height="0.25" depth="0.25" color="#92400e"></a-box>
-        <a-cylinder id="pasak-pin" position="0 0.25 0" radius="0.06" height="0.45" color="#ef4444"></a-cylinder>
-        <a-text value="[3] Sambungan Bapasak" position="-0.7 0.75 0" color="#fbbf24" width="3"></a-text>
+      <!-- 3. Sambungan Kayu Bapasak -->
+      <a-entity id="obj-pasak" position="1.5 0.25 0" onclick="interact(3)">
+        <a-box width="0.9" height="0.28" depth="0.28" color="#92400e"></a-box>
+        <a-cylinder id="pasak-pin" position="0 0.28 0" radius="0.07" height="0.5" color="#ef4444"></a-cylinder>
+        <a-text value="[3] Sambungan Bapasak" position="-0.85 0.85 0" color="#fbbf24" width="3.5"></a-text>
       </a-entity>
 
-      <!-- Titik Interaksi 4: Indikator Beban & Lingkungan -->
-      <a-entity id="obj-hazard" position="0 1.4 -0.5" class="clickable" onclick="interact(4)">
-        <a-octahedron id="hazard-beacon" radius="0.22" color="#ef4444"></a-octahedron>
-        <a-text value="[4] Sensor Risiko" position="-0.45 0.35 0" color="#f87171" width="3"></a-text>
+      <!-- 4. Sensor Risiko -->
+      <a-entity id="obj-hazard" position="0 1.45 -0.4" onclick="interact(4)">
+        <a-octahedron id="hazard-beacon" radius="0.25" color="#ef4444" animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-octahedron>
+        <a-text value="[4] Sensor Risiko" position="-0.55 0.4 0" color="#f87171" width="3.5"></a-text>
       </a-entity>
-
     </a-entity>
 
-    <!-- Kamera dengan Kursor Klik -->
     <a-camera position="0 1.6 0">
       <a-cursor color="#fbbf24"></a-cursor>
     </a-camera>
@@ -144,52 +135,44 @@
     let completedSteps = new Set();
     let currentScenarioIndex = 0;
 
-    // Simulasi Mesin Generative AI: Menghasilkan Variasi Kasus & Parameter Visual 3D
     const aiScenarios = [
       {
         tag: "GenAI Skenario #1 • Angin Kencang Lembah Anai",
         title: "Variasi Kasus: Konstruksi Atap Gonjong di Ketinggian 12m",
         desc: "GenAI mendeteksi kecepatan angin 35 knot dan kelembapan tinggi. Evaluasi kembali titik tumpu perancah dan pengunci pasak kayu sebelum pengangkatan kuda-kuda atap!",
-        skyColor: "#0f172a",
-        beaconColor: "#ef4444",
-        pasakColor: "#ef4444"
+        skyColor: "#0f172a", beaconColor: "#ef4444", pasakColor: "#ef4444"
       },
       {
         tag: "GenAI Skenario #2 • Area Rawan Gempa Pesisir",
         title: "Variasi Kasus: Simulasi Beban Lateral pada Struktur Bapasak",
         desc: "GenAI memodifikasi parameter getaran tanah. Nilai filosofi 'Alam Takambang Jadi Guru' menuntut struktur lentur namun terkunci. Verifikasi kelonggaran pasak & jalur evakuasi!",
-        skyColor: "#31102f",
-        beaconColor: "#f59e0b",
-        pasakColor: "#f59e0b"
+        skyColor: "#31102f", beaconColor: "#f59e0b", pasakColor: "#f59e0b"
       },
       {
         tag: "GenAI Skenario #3 • Pekerjaan Malam & Pencahayaan Minim",
         title: "Variasi Kasus: Pengecoran & Perakitan Balok Utama Shift Malam",
         desc: "GenAI menurunkan visibilitas lingkungan 3D. Pastikan rompi reflektif (APD), pengaman tepi perancah, dan komunikasi isyarat antarpekerja aktif.",
-        skyColor: "#020617",
-        beaconColor: "#38bdf8",
-        pasakColor: "#ef4444"
+        skyColor: "#020617", beaconColor: "#38bdf8", pasakColor: "#ef4444"
       }
     ];
 
     function setMode(mode) {
       const video = document.getElementById('video-bg');
       const sky = document.getElementById('vr-sky');
-      const ground = document.getElementById('vr-ground');
-
+      const floor = document.getElementById('vr-floor');
       if (mode === 'AR') {
         sky.setAttribute('visible', 'false');
-        ground.setAttribute('visible', 'false');
+        floor.setAttribute('visible', 'false');
         video.style.display = 'block';
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
           navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
             .then(stream => { video.srcObject = stream; })
-            .catch(() => alert("Izin kamera tidak aktif. Menampilkan overlay AR simulasi."));
+            .catch(() => alert("Izinkan akses kamera pada browser untuk latar belakang AR."));
         }
       } else {
         video.style.display = 'none';
         sky.setAttribute('visible', 'true');
-        ground.setAttribute('visible', 'true');
+        floor.setAttribute('visible', 'true');
       }
     }
 
@@ -226,18 +209,14 @@
       completedSteps.clear();
       document.getElementById('progress-text').innerText = `Titik Interaksi Selesai: 0/4`;
       document.getElementById('safety-score').innerText = `Skor K3: 0%`;
-
       const sc = aiScenarios[currentScenarioIndex];
       currentScenarioIndex = (currentScenarioIndex + 1) % aiScenarios.length;
-
       document.getElementById('ai-tag').innerText = sc.tag;
       document.getElementById('panel-title').innerText = sc.title;
       document.getElementById('panel-desc').innerText = sc.desc;
-
-      // Ubah visual objek 3D secara dinamis sesuai output GenAI
       document.getElementById('vr-sky').setAttribute('color', sc.skyColor);
       document.getElementById('hazard-beacon').setAttribute('color', sc.beaconColor);
-      document.getElementById('pasak-pin').setAttribute('position', '0 0.25 0');
+      document.getElementById('pasak-pin').setAttribute('position', '0 0.28 0');
       document.getElementById('pasak-pin').setAttribute('color', sc.pasakColor);
       document.querySelector('#obj-apd a-cylinder').setAttribute('color', '#f97316');
       document.querySelector('#obj-scaffold a-box').setAttribute('color', '#94a3b8');
